@@ -3,82 +3,70 @@
 
   <head>
     <meta charset="UTF-8">
-    <title>Todoアプリ(Vuetify)20260408</title>
-    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/vuetify@3.6.11/dist/vuetify.min.css'>
-<link rel='stylesheet' href='https://unpkg.com/@mdi/font@6.x/css/materialdesignicons.min.css'>
-<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900'>
+    <title>20260416_天気_アイコン追加</title>
+    <link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/vuetify@3/dist/vuetify.min.css'>
+<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css'>
 
   </head>
     
   <body>
-  <!-- Vueで指定された"app"要素、この中でのみVueが有効 -->
-<div id="app">
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js">  </script>
+<!---->
+
+<div id="app">  
   <v-app>
-    <v-main>
-      <v-container>
-        <v-row
-          class="text-h3 mb-3 mt-3"
-          justify="center"
-        >
-          My ToDo App
-        </v-row>
-
-        <v-row
-          class="mb-3 mt-3"
-          align="center"
-          justify="center"
-        >
-          <v-col cols="6">
-            <v-text-field label="Label" variant="underlined"></v-text-field>
-          </v-col>
-        </v-row>
-
-        <v-row
-          class="mb-3 mt-3"
-          align="center"
-          justify="center"
-        >
-          タスク内容：{{ task }}
-
-          <v-btn
-            class="ml-3"
-            color="indigo"
-            size="small"
-            rounded="pill"
-            @click="addTask"
-          >
-            <v-icon icon="mdi-plus" class="mr-1"></v-icon>
-            追加
-          </v-btn>
-        </v-row>
-
-        <v-row
-          class="mb-3 mt-3"
-          justify="center"
-        >
-          <v-btn
-            rounded
-            variant="tonal"
-            @click="clearAll"
-          >
-            全てのToDoをクリア
-          </v-btn>
-        </v-row>
-
-        <v-row
-          class="mb-3 mt-3"
-          justify="center"
-          v-for="(todo, i) in todoList"
-          :key="i"
-        >
-          {{ todo }}
-        </v-row>
-      </v-container>
-    </v-main>
+    <v-container> 
+      <div v-if="areaTime">
+      今日の天気
+      <p> {{areaTime[0]}} </p> 
+    
+      <br>  
+      
+      </div> 
+        
+      <v-select label="地域を選択"
+                :items="areaData"
+                item-title="area.name"
+                return-object
+                v-model="selectedRegion">  
+<!-- タイトル変えてみるといろいろでる 
+return-object titleとmodelの間の時は→あり(selectedRegionがareaData)　なし(selectedRegionのところがareaname) 
+itemsは選択肢の元データ
+titleは選択肢に表示する文字
+valueはmodelに入れる値  ある(items)　　　なし(itemsに渡しているオブジェクト全体を取得できる)
+modelは選択結果を受け取る
+-->
+      </v-select>
+      
+      <div v-if="selectedRegion">
+     
+    　  <v-sheet   :class="weatherBG"
+                   height="200"
+                   rounded="lg">
+    　<br>
+        
+        
+<!-- 選択された地域の名前を入れる -->
+選択地域：    {{ selectedRegion.area.name }}
+  <!--     -->
+    　  <br>
+       
+<!-- 選択された地域の天気を入れる  でてこん  これを出すと全部消えてた-->
+選択地域の天気：  {{ selectedRegion.weathers[0] }}
+   　   <br>
+    　   <v-icon size=60 
+                :color="weatherColor"> 
+     {{ weatherIcon }}
+    　   </v-icon>
+        </v-sheet>
+       </div>
+      
+      
+    </v-container>
   </v-app>
 </div>
     <script src='https://unpkg.com/vue@3/dist/vue.global.js'></script>
-<script src='https://cdn.jsdelivr.net/npm/vuetify@3.6.11/dist/vuetify.min.js'></script><script  src="./script.js"></script>
+<script src='https://cdn.jsdelivr.net/npm/vuetify@3/dist/vuetify.min.js'></script><script  src="./script.js"></script>
 
   </body>
   

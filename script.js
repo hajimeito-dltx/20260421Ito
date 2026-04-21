@@ -1,32 +1,79 @@
-const { createApp, ref } = Vue;
-// Vuetify を取り出し
-const { createVuetify } = Vuetify;
-
-// Vuetify を作ってプラグイン登録する
-const vuetify = createVuetify();
+const { createApp, ref, onMounted, computed } = Vue
+const { createVuetify } = Vuetify
+const vuetify = createVuetify()
 
 createApp({
-  setup: function () {
-    // Vue内部で使いたい変数は全て ref で定義する
-    const task = ref('');          // タスク内容を保持する
-    const todoList = ref([]);      // タスク一覧（配列）
-
-    // 関数はここ
-    function addTask() {
-      console.log('次のタスクが追加されました：', task.value);
-      // 配列の先頭に現在のタスク内容を追加する（最後尾の場合は push）
-      todoList.value.unshift(task.value);
-      console.log('現在のToDo一覧：', todoList.value);
-    }
+  setup () {
+    
+      const areaData = ref([])
+      const selectedRegion = ref(null)
+      const areaTime = ref([])
       
-    // 全てのタスクを消去する
-    function clearAll() {
-      todoList.value = []; // 配列を空にする
-      console.log('全てのタスクを削除しました');
-    }
+    onMounted(async () => {
+      const res = await axios.get(
+        'https://www.jma.go.jp/bosai/forecast/data/forecast/130000.json'
+      )
+      areaData.value = res.data[0].timeSeries[0].areas
+      areaTime.value = res.data[0].timeSeries[0].timeDefines
+      
+ //      console.log(areaData.value);
+ //      console.log(selectedRegion.value);
+         
+    })
+      console.log(areaTime.value);
+//      const areatimeResult = slice.areaTime[0](0,5);
+    
+    const weatherIcon = computed(() =>{
+      const weatherCodeH = selectedRegion.value.weatherCodes[0]
+      console.log(weatherCodeH)
+      const weatherCodeA = Math.floor(weatherCodeH / 100)
+      if ( weatherCodeA === 1 ){
+        return "mdi-weather-sunny"
+      } else if (weatherCodeA === 2){
+        return "mdi-weather-cloudy"
+      } else if (weatherCodeA === 3){
+        return "mdi-weather-rainy"
+      } else if (weatherCodeA === 4){
+        return "mdi-weather-snowing"
+      } else{
+        "error"
+      }
+})
+    const weatherColor = computed(() =>{
+      const weatherCodeH = selectedRegion.value.weatherCodes[0]
+      const weatherCodeA = Math.floor(weatherCodeH / 100)
+      if ( weatherCodeA === 1 ){
+        return 'red'
+      } else if (weatherCodeA === 2){
+        return 'grey'
+      } else if (weatherCodeA === 3){
+        return "blue"
+      } else if (weatherCodeA === 4){
+        return "white"
+      } else{
+        "error"
+      }
+})
+    
+    const weatherBG = computed(() =>{
+      const weatherBGc = selectedRegion.value.weatherCodes[0]
+      const weatherBGr = Math.floor(weatherBGc / 100)
+      if ( weatherBGr === 1 ){
+        return 'bg-orange-lighten-4'
+      } else if (weatherBGr === 2){
+        return 'bg-blue-grey-lighten-4'
+      } else if (weatherBGr === 3){
+        return "bg-blue-lighten-4"
+      } else if (weatherBGr === 4){
+        return "bg-cyan-lighten-4"
+      } else{
+        "error"
+      }
+})
+    
 
-    // HTML から使いたい変数や関数を return で返す、clearAllも追加
-    return { task, todoList, addTask, clearAll };
+    return{ areaData, selectedRegion, weatherIcon, weatherColor, weatherBG, areaTime  }
   }
-})  .use(vuetify)          // Vuetify を使う宣言
-  .mount('#app');        // Vue が管理するDOM
+})
+.use(vuetify)
+.mount('#app')
